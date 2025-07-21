@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contato;
 use Illuminate\Http\Request;
 
 class ContatoController extends Controller
@@ -23,8 +24,22 @@ class ContatoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nome' => 'required|string|max:255',
+            'telefone' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'aniversario' => 'required|date',
+            'foto' => 'required|string|max:255',
+        ]);
+
+        Contato::create($validated);
+
+        return response()->json([
+            'message' => 'Validação com $this->validate() feita com sucesso!',
+            'data' => $validated
+        ]);
     }
+
 
     /**
      * Display the specified resource.
