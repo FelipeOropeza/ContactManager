@@ -8,20 +8,20 @@ use Illuminate\Http\Request;
 
 class ContatoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
+        $contato = Contato::all();
+
+        if ($contato->isEmpty()) {
+            return response()->json(['message' => 'Nenhum contato encontrado'], 404);
+        }
+
         return response()->json([
-            'message' => 'List of contacts',
-            'data' => [] // This should return the actual list of contacts from the database
+            'message' => 'Lista de contatos',
+            'data' => $contato
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -35,33 +35,57 @@ class ContatoController extends Controller
         Contato::create($validated);
 
         return response()->json([
-            'message' => 'Validação com $this->validate() feita com sucesso!',
+            'message' => 'Contato criado com sucesso!',
             'data' => $validated
         ]);
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        $contato = Contato::find($id);
+
+        if (!$contato) {
+            return response()->json(['message' => 'Contato não encontrado'], 404);
+        }
+        return response()->json([
+            'data' => $contato
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $contato = Contato::find($id);
+
+        if (!$contato) {
+            return response()->json(['message' => 'Contato não encontrado'], 404);
+        }
+
+        $validated = $request->validate([
+            'nome' => 'required|string|max:255',
+            'telefone' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'aniversario' => 'required|date',
+            'foto' => 'required|string|max:255',
+        ]);
+
+        $contato->update($validated);
+
+        return response()->json([
+            'message' => 'Contato atualizado com sucesso!',
+            'data' => $contato
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $contato = Contato::find($id);
+
+        if (!$contato) {
+            return response()->json(['message' => 'Contato não encontrado'], 404);
+        }
+
+        $contato->delete();
+
+        return response()->json(['message' => 'Contato deletado com sucesso']);
     }
 }
